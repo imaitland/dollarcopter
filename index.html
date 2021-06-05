@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8"/>
+    </head>
+    <body>
+        <canvas id="tile" width="674" height="836" style="position:absolute;"></canvas>
+        <canvas id="canvas" width="674" height="836" style="position:absolute;"></canvas>
+    </body>
+    <script type="module">
+        import {latlngToScreenXY} from './equirectangular.js';
+
+        // Server endpoint goes here.
+        const SERVER = "TODO";
+
+        function clearCanvas(canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function drawCopter(ctx, long, lat) {
+            let {x,y}= latlngToScreenXY(long,lat);
+            ctx.shadowColor = 'black';
+            ctx.shadowOffsetX = 5;
+            ctx.shadowOffsetY = 5;
+            ctx.shadowBlur = 3;
+
+            ctx.font = '30px serif'
+            ctx.textAlign = "center"; 
+            ctx.textBaseline = "middle"; 
+            ctx.fillText('💸', x, y);
+        }
+
+        function drawTile(ctx) {
+            return function (tile) {
+                ctx.drawImage(tile.target,0,0);
+            }
+        }
+
+        function init() {
+            const tile = document.getElementById('tile');
+            const tile_ctx = tile.getContext('2d');
+
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            const tile_image = new Image();
+            tile_image.src = "./tile.png";
+            tile_image.onload = drawTile(tile_ctx);
+
+            // TODO: setup WS connection. 
+            /*
+            var webSocket = new WebSocket(SERVER);
+            webSocket.onmessage = function (event) {
+                clearCanvas(canvas);
+                console.log(event.data);
+                // For each copter in event.data, draw copter
+            }
+            */
+
+            // test copter location.
+            // 39.304670, -76.627180
+            drawCopter(ctx, 39.304670, -76.627180);
+        }
+        document.addEventListener("DOMContentLoaded", init)
+    </script>
+</html>
